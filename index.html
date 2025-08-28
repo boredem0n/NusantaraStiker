@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nusantara Stiker - Customer Search & Print</title>
+    <title>Nusantara Kreasi - Customer Search & Print</title>
     <!-- Tailwind CSS for styling -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Font Awesome for icons -->
@@ -291,9 +291,9 @@
         function generatePdf(name, address, phone) {
             const doc = new jsPDF();
 
-            // Set font styles
+            // Set font styles for PENERIMA
             doc.setFont("helvetica", "bold");
-            doc.setFontSize(14);
+            doc.setFontSize(18); // Increased font size for "PENERIMA"
 
             // Add Penerima (Recipient) details
             doc.text("PENERIMA :", 15, 20);
@@ -302,17 +302,17 @@
             doc.setFontSize(12);
             // Use splitTextToSize to handle long addresses
             const recipientLines = doc.splitTextToSize(`${name}\n${address}\n${phone}`, 180);
-            doc.text(recipientLines, 20, 30);
+            doc.text(recipientLines, 20, 32); // Adjusted Y-position for spacing
 
             // Add Pengirim (Sender) details
             doc.setFont("helvetica", "bold");
             doc.setFontSize(14);
-            doc.text("PENGIRIM:", 15, 70);
+            doc.text("PENGIRIM:", 15, 80); // Adjusted Y-position for spacing
 
             doc.setFont("helvetica", "normal");
             doc.setFontSize(12);
             const senderLines = "NUSANTARA STIKER\nSEMARANG\n081936328351";
-            doc.text(senderLines, 20, 80);
+            doc.text(senderLines, 20, 90); // Adjusted Y-position for spacing
 
             // Save the PDF, triggering a download
             doc.save(`label-${name}.pdf`);
