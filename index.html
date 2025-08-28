@@ -12,6 +12,9 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- jsPDF Library for PDF Generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
     <style>
         /* Custom styles for a better look and feel */
         body {
@@ -120,7 +123,10 @@
     </div>
 
     <script>
-        // --- CUSTOMER DATABASE FROM CSV ---
+        // --- INITIALIZE JSPDF ---
+        const { jsPDF } = window.jspdf;
+
+        // --- CUSTOMER DATABASE ---
         const customerDatabase = [
             { name: "Aan Sticker", address: "Jl. Sawo RT 03/14, Maoslor, Kec. Maos, Kab. Cilacap, 53272", phone: "085747816185" },
             { name: "Adi Demak", address: "Jl Motang Rua, Langke Rembong, RT 05 RW 03, Kab. Manggarai, NTT, 86511", phone: "081236788385" },
@@ -262,7 +268,7 @@
                 customerCard.className = 'p-4 border border-gray-200 rounded-lg bg-gray-50 hover:bg-blue-100 hover:shadow-md transition-all cursor-pointer';
                 
                 customerCard.addEventListener('click', () => {
-                    openPrintableTab(customer.name, customer.address, customer.phone);
+                    generatePdf(customer.name, customer.address, customer.phone);
                 });
                 
                 customerCard.innerHTML = `
@@ -273,7 +279,7 @@
                             <p class="text-gray-600"><i class="fas fa-phone fa-fw mr-2 text-gray-400"></i>${customer.phone}</p>
                         </div>
                         <div class="text-blue-500">
-                            <i class="fas fa-print text-2xl"></i>
+                            <i class="fas fa-file-pdf text-2xl"></i>
                         </div>
                     </div>
                 `;
@@ -281,33 +287,35 @@
             });
         }
 
-        // --- PRINTABLE TAB FUNCTIONALITY ---
-        function openPrintableTab(name, address, phone) {
-            const labelHTML = `
-                <html>
-                <head><title>Print Label - ${name}</title></head>
-                <body style="font-family: Arial, sans-serif; margin: 40px; font-size: 18px; line-height: 1.8;">
-                    <p style="font-weight: bold; margin: 0 0 10px 0;">PENERIMA :</p>
-                    <div style="padding-left: 10px;">
-                        <p style="margin: 0 0 5px 0;">${name}</p>
-                        <p style="margin: 0 0 5px 0;">${address}</p>
-                        <p style="margin: 0 0 25px 0;">${phone}</p>
-                    </div>
-                    
-                    <p style="font-weight: bold; margin: 0 0 10px 0;">PENGIRIM:</p>
-                    <div style="padding-left: 10px;">
-                        <p style="margin: 0 0 5px 0;">NUSANTARA STIKER</p>
-                        <p style="margin: 0 0 5px 0;">SEMARANG</p>
-                        <p style="margin: 0;">081936328351</p>
-                    </div>
-                </body>
-                </html>
-            `;
+        // --- PDF GENERATION FUNCTIONALITY ---
+        function generatePdf(name, address, phone) {
+            const doc = new jsPDF();
+
+            // Set font styles
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(14);
+
+            // Add Penerima (Recipient) details
+            doc.text("PENERIMA :", 15, 20);
             
-            const printWindow = window.open('', '_blank');
-            printWindow.document.write(labelHTML);
-            printWindow.document.close();
-            printWindow.focus(); // Focus on the new tab
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(12);
+            // Use splitTextToSize to handle long addresses
+            const recipientLines = doc.splitTextToSize(`${name}\n${address}\n${phone}`, 180);
+            doc.text(recipientLines, 20, 30);
+
+            // Add Pengirim (Sender) details
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(14);
+            doc.text("PENGIRIM:", 15, 70);
+
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(12);
+            const senderLines = "NUSANTARA STIKER\nSEMARANG\n081936328351";
+            doc.text(senderLines, 20, 80);
+
+            // Save the PDF, triggering a download
+            doc.save(`label-${name}.pdf`);
         }
 
 
@@ -340,4 +348,3 @@
     </script>
 </body>
 </html>
-
