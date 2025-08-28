@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nusantara Kreasi - Customer Search</title>
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Custom styles for a better look and feel */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f2f5;
+        }
+        .card {
+            background-color: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s, box-shadow 0.2s;
+        }
+        .btn-primary {
+            background-color: #2563eb;
+            color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .btn-primary:hover {
+            background-color: #1d4ed8;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .input-field {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .input-field:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+        }
+        .icon-input {
+            position: relative;
+        }
+        .icon-input i {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6b7280;
+        }
+        .icon-input .input-field {
+            padding-left: 48px;
+        }
+    </style>
+</head>
+<body class="antialiased text-gray-800">
+
+    <div class="container mx-auto p-4 sm:p-6 lg:p-8 max-w-4xl">
+
+        <!-- Header Section -->
+        <header class="text-center mb-8">
+             <img src="https://i.ibb.co/0jR0DvBB/Whats-App-2025-08-28-22-38-25-750e32a5.jpg" alt="Nusantara Kreasi Logo" class="inline-block rounded-xl shadow-md border border-gray-200" />
+        </header>
+
+        <main>
+            <!-- Search Section -->
+            <div class="card mb-8">
+                <h2 class="text-xl font-semibold mb-4 text-gray-700">Customer Database Search</h2>
+                <div class="icon-input">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" class="input-field" placeholder="Search by Name, City, or Address...">
+                </div>
+                <div id="results" class="mt-6 space-y-4"></div>
+            </div>
+
+            <!-- Add New Customer Form (hidden by default) -->
+            <div id="addCustomerCard" class="card mb-8 hidden">
+                <div class="text-center mb-4">
+                    <i class="fas fa-user-plus text-3xl text-blue-500"></i>
+                    <h2 class="text-xl font-semibold mt-2 text-gray-700">Customer Not Found</h2>
+                    <p class="text-gray-500">Please add their details below.</p>
+                </div>
+                <form id="addCustomerForm" class="space-y-4">
+                    <div>
+                        <label for="newName" class="block text-sm font-medium text-gray-600 mb-1">Name</label>
+                        <input type="text" id="newName" class="input-field" required>
+                    </div>
+                    <div>
+                        <label for="newAddress" class="block text-sm font-medium text-gray-600 mb-1">Address</label>
+                        <input type="text" id="newAddress" class="input-field" required>
+                    </div>
+                    <div>
+                        <label for="newPhone" class="block text-sm font-medium text-gray-600 mb-1">Phone Number</label>
+                        <input type="tel" id="newPhone" class="input-field" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-full">
+                        <i class="fas fa-save mr-2"></i> Add Customer
+                    </button>
+                </form>
+                 <div id="addStatus" class="mt-4 text-center"></div>
+            </div>
+
+            <!-- Delivery Fee Calculator Section -->
+            <div class="card">
+                <h2 class="text-xl font-semibold mb-4 text-gray-700">Check Delivery Fee</h2>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-600 mb-1">From</label>
+                        <p id="fromAddress" class="p-3 bg-gray-100 rounded-lg text-gray-600">Jalan Pasir Mas I no 151, postcode: 50177</p>
+                    </div>
+                    <div>
+                        <label for="toAddress" class="block text-sm font-medium text-gray-600 mb-1">To</label>
+                        <div class="icon-input">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <input type="text" id="toAddress" class="input-field" placeholder="Enter destination address">
+                        </div>
+                    </div>
+                    <button id="checkFeeBtn" class="btn btn-primary w-full">
+                        <i class="fas fa-shipping-fast mr-2"></i> Check Ongkir
+                    </button>
+                </div>
+                <div id="deliveryResults" class="mt-6 space-y-3"></div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // --- CUSTOMER DATABASE FROM CSV ---
+        const customerDatabase = [
+            { name: "Aan Sticker", address: "Jl. Sawo RT 03/14, Maoslor, Kec. Maos, Kab. Cilacap, 53272", phone: "085747816185" },
+            { name: "Adi Demak", address: "Jl Motang Rua, Langke Rembong, RT 05 RW 03, Kab. Manggarai, NTT, 86511", phone: "081236788385" },
+            { name: "Agus Nia", address: "Jl Dusun Karangan Gang Kenanga Kulon, Kec Cerme Kab. Gresik", phone: "083857224249" },
+            { name: "Ahmad Mukhlis Saputro", address: "Dsn. Ngemplak, RT7 RW1. Desa Wonogiri, Kec. Kajoran, Kab. Magelang, Jawa Tengah", phone: "088226392011" },
+            { name: "Ahmad Rafii Stiker", address: "Jl Cilik Riwut KM 29, Kec. Bukit Batu, Palangkaraya, Kalimantan Tengah", phone: "083114829363" },
+            { name: "Alif Sticker", address: "Kelurahan Lawangirung, Lingkungan 3, Kecamatan Wenang, Kota Manado, Provinsi Sulawesi Utara, 95111", phone: "081342718654" },
+            { name: "Alimustakim", address: "Desa gedangalas, RT 05, RT 01, Kec. Gajah, Kab. Demak, Prov. Jawa Tengah, 59581", phone: "081387396724" },
+            { name: "Amy Sticker", address: "Jl Akhmad Yani, Kel. Beriwit no 127, RT 03 RW 03, Kab. Murung Raya, Murung, Kalimantan Tengah, 73911", phone: "085284999644" },
+            { name: "Andeng Qincay", address: "Toko Sticker Balai-Balai, Padang Panjang Barat, Padang Panjang", phone: "081266033855" },
+            { name: "Andhy Variasi", address: "Jl Sri Pelayang RT 09, dekat Jembatan Beatrix Samping Lapangan Futsal Zalby, Kec. Sarolangun, Prov. Jambi", phone: "092216391488" },
+            { name: "Andi Setiawan / Bungsu Variasi", address: "Desa Panca Agung RT 1 RW 1 Kec. Tanjung Palas Utara Kab. Bulungan, Prov. Kalimantan Utara", phone: "Phone" },
+            { name: "Arifin", address: "Dusun Tompe, Desa Barang, Kec. Panggul, Kab. Trenggalek, Jawa Timur, 66364", phone: "082142828531" },
+            { name: "Arwawan Stiker", address: "Jalan Trans Sulawesi, Desa Bunuyo, Kec Paguat, Kab. Powuhato, Gorontalo", phone: "085298535503" },
+            { name: "Asril Sticker", address: "Jalan Uluwatu 1 No 150, Lingkungan Kelan, Kelurahan Tuban, Kuta Selatan, Kabupaten Badung, Bali", phone: "082342282182" },
+            { name: "Baharuddin", address: "Lingkungan 5 Kompleks SMAN 1 Kodeoha, Kel. Mala Mala, Kec. Kodeoha, Kab. Kolaka Utara, Sulawesi Tenggara", phone: "0822990201362" },
+            { name: "Bampe Sticker", address: "Jl Trans Sulawesi (depan kantor ninja express & kantor mandala bahodopi), Desa Bahodopi, Kec. Bahodopi, Kab. Morowali, Prov. Sulawesi Tengah", phone: "082271072077" },
+            { name: "Bapak Indra", address: "Toko Akuarius, Lampu Merah Pasaman Baru, Kabupaten Pasaman Barat, Sumatera Barat", phone: "085211372275" },
+            { name: "Bintank Wrapping", address: "Planet Stiker, Kompleks Terminal, Matawai, Kota Waingapu, Kabupaten Sumba Timur, NTT", phone: "085333919222" },
+            { name: "Black Sticker & Kaca Film / Hartono", address: "Jl Raya Kanci Kulon Blok Kemis RT 03 RW 01, Kec. Astana Japura, Kab. Cirebon", phone: "081292216556" },
+            { name: "Burhan", address: "Jl. Panjaitan Lingk. 3, Kampung Arab, Kel. Istiqlal, Kec. Wenang Manado, Sulawesi Utara", phone: "085320665984" },
+            { name: "Dempo Sticker / Toni Heriadi", address: "Jl Darusallam gang kunyang no 99, Kel. Langkapura Baru, Kec. Langkapura, Kota Bandar Lampung", phone: "081321275444" },
+            { name: "Dipa Jayadipa / Toko Jayadipa Cell", address: "Jl. Untung Suropati No 20, Pringrejo, Pekalongan Barat, Jawa Tengah", phone: "085866123334" },
+            { name: "Dunia Sablon", address: "Ds. marga Kencana, Kec. Toili, kab Banggai, Sulawesi Tengah", phone: "085756387386" },
+            { name: "Effendi Zarkan", address: "Rumah Biru PSIS Jl Karang anyar 2 no 1, Ngasem, RT7 RW5, Pudak Payung, Kec Banyumanik, Semarang", phone: "089530932989" },
+            { name: "Eko Bina Karya Stiker", address: "Desa Seluas, kec. Seluas, Kab. Benngkayang, Kalimantan Barat", phone: "081345516617" },
+            { name: "Eksis Sticker", address: "Jl Poros Makasar, Pare Pare, Desa Lampoko, Kec. Balusu Kabupaten Barru, Sumatera Selatan, 90762", phone: "081355618618" },
+            { name: "Eng Ong Sticker", address: "Pasar Monas, Jl. Raya Lekoko, DS. Pasinan, Kec. Lekok, Kab. Pasuruan, Jawa Timur, 67186", phone: "085646780781" },
+            { name: "Ernawati", address: "Jl Mr Iskandar 2 no 6, Blora Kota, Kabupaten Blora, Kampung", phone: "085806561690" },
+            { name: "Farhan Abas", address: "Jl Desa Botutonuo, Kec. Kabilo Bone, Kab. Bone Balango, Prov. Gorontalo, 96583", phone: "082193221558" },
+            { name: "Febri / Mitra Helm", address: "Mitra Helm, Jl Trenggana NO 15, Penatih, Kec. Denpasar Timur, Denpasar", phone: "081379562460" },
+            { name: "Gadink / Feny", address: "Jl. Tgh Ahyar Abduh Gg. Al-Halimi II, Ling. Kebontalo Jaya, RT 02, Bintaro ampenan, Kota Mataram, Ampenan, Nusa Tenggara Barat, 83114", phone: "087865905631" },
+            { name: "Gilang Sticker", address: "Jl Bumi Utomo P 21 D, Wua-wua, Kendari, Kec. Kadia THR Samping masjid Annur, Kab Sultra, 93111", phone: "082338161824" },
+            { name: "Hadi Stiker", address: "Jl Andan Sari Bandung Gg 7 No 24 Kec. Lamongan, Kab. Lamongan, 62216", phone: "085704644661" },
+            { name: "Hari Sandi", address: "Jl Talajungan Dusun Minian, Desa Pasanggar, Kab Pamekasan, Jawa Timur", phone: "081977717849" },
+            { name: "Hariyanto", address: "Muka Kantor Camat Toili, Bengkel Hari Motor, Desa Rusa Kencana, Kecamatan Toili, Kabupaten Banggai, Propinsi Sulawesi Tengah", phone: "08575788998" },
+            { name: "Harun Sticker", address: "Jl Baypass Lorong Labora 1, Laiwaru, Kab. Muna, Batalaiwaru, Sulawesi Tenggara", phone: "082253415466" },
+            { name: "Hengki / Toko Bagas Variasi", address: "Desa Pauh Terenjo, Kec. XIV Koto, Kab. Mukomuko, Prov. Bengkulu, 38755", phone: "081278299874" },
+            { name: "Ito Anita", address: "Jl Cibingbin blok paing RT 07 RW 03, Desa Cibingbin, Kec. Cibingbin, Kab. Kuningan, Jawa Barat, 45587", phone: "085863106413" },
+            { name: "Jasmank Sr", address: "Singai Timur, Desa Biroro, Dekat bengkel Berkah Motor, Dekat sekolah Dasar no 26 rompe, Sulawesi Selatan", phone: "085246049764" },
+            { name: "Juforlando Variasi", address: "RT 02 Ds. Awer, Kec. Sahu Timur, Kota Jailoko, Kab. Halmahera Barat, Maluku Utara, 97752", phone: "082299957509" },
+            { name: "KD Sticker", address: "Kampung 4 Simpang Amal, Kompice depan mesjid Al Iksan, Kota Tarakan, Kalimantan Utara", phone: "0896770221441" },
+            { name: "Khatulistiwa Stiker", address: "Jl Imam bonjol no 08, Kel Api-api, Kec. Bontang Utara, Kalimantan Timur, 75311", phone: "081346374706" },
+            { name: "Lukman", address: "Jl Sinjai Timur, dekat jembatan Toboe, Desa Biroro, Kec. Sinjai Timur, Kab. Sinjai, Prov. Sulawesi Selatan, 92614", phone: "081278299874" },
+            { name: "Mas Petrick", address: "Ds Karangharjo RT 04, RW 02, Sebelah timur asrama polsek, Kragan, Rembang, Jawa Tengah, 59273", phone: "081219028303" },
+            { name: "Moh Jaini", address: "Jl Asahan RT 9 Dusun 3 No 5, Desa Bangun Jaya, Kec. Kali Orang, Kab. Kutai Timur, Prov. Kalimantan Timur, 75617", phone: "085346050929" },
+            { name: "Moh Sochib / Khotimah", address: "Bakateu, Betan, Malaka Tengah, Kab. Malaka, NTT, 85762", phone: "082298707972" },
+            { name: "Muhammad Thoriqul Huda", address: "Ambukembang Gang 10 no 32, rt 6 rw 3, Kedungwuni, Pekalongan, Kab Kajen, Jawa Tengah 51173", phone: "081548282057" },
+            { name: "Muhi Stiker", address: "Jl Sepande RT 18 RW 5 No 75, Kec. Candi, Kab. Sidoarjo, Jawa Timur, 161271", phone: "085731834944/085850005988" },
+            { name: "Nazril", address: "Address", phone: "Phone" },
+            { name: "Nizar / Farida Ms Glow/ Vita", address: "Jl Kamboja RT 4 RW 5 Kemuning, Menunggal Kedamean, Gresik", phone: "081335847951" },
+            { name: "Nur Stiker", address: "Jl Gunung Batur No 10, Lingkungan Srimandala Dauh Waru, Negara Bali, Kec. Negara, Kab. Jembrana, 82217", phone: "087760483847" },
+            { name: "Onal Hasim", address: "BFS Sablon, Desa Lukulamo, Kec. Weda Tengah, Kab. Halmahera tengah, propinsi Maluku Utara, 97853", phone: "085311122290" },
+            { name: "Pegy Aditama/ Jago Sticker", address: "Toko Perempatan lampu merah pas samping pos polisi, Batulicin, Kec. Simpang Empat, Kab. Tanah Bumbu, Kalimantan Selatan, 72211", phone: "087721638570" },
+            { name: "Pian Brahima", address: "Jl. Bhayangkara, Nunukan Tengah, Kec. Nunukan, Kab. Nunukan, Prov. Kalimantan Utara", phone: "089530466060" },
+            { name: "Radhen Kurnia", address: "Jl Kp. Babakan RT 04/1 (Deden Kurniawan), Ds. Babakan Jaya, Kec. Parung Kuda, Sukabumi, Jawa Barat, 43357", phone: "085722220002" },
+            { name: "Rama / Pink Varian 04", address: "Jl Transmigrasi KM IV no 4, Bersujud, Batulicin, depan GS Mart Plajau, Kab. Tanah Bumbu, Batulicin, Kalimantan Selatan, 72211", phone: "082250447405" },
+            { name: "Rizal", address: "Billy Ambon BCM Motor Tekindo, Bengkel Motor Bone Jaya Motor, Lokolamo, Weda Tengah, Halmahera Tengah, Maluku Utara", phone: "081242581463" },
+            { name: "Rusdiutono/ Toko Panca Variasi", address: "Jl. Bangkinang Petopahan, Desa SP3, Bukit Payung, Kec. Bangkinang Seberang, Kab. Kampar, Prov. Riau, 28461", phone: "081374773823" },
+            { name: "Saharuddin / Toko Zhoppenk Stiker", address: "Jl. Ir Soekarno Tumpas Aunaaha no 507, Kab. Konawe, Sulawesi Tenggara, 93411", phone: "082395655888" },
+            { name: "Sahrul Umam / Panglima Stiker", address: "Pamekasan, Dusun Langgar, Desa Pangorayan, Kec Proppo, 69363", phone: "085895880371" },
+            { name: "Said Bintoro / Istiqomah", address: "Jl Demung Trengguli KM 1, Demung Wetan Kerang kulon, RT 03/05, Wonosalam Demak, Jawa Tengah, 59571", phone: "082210993184" },
+            { name: "Saleh Danish", address: "Jl Raya Pandugo no 208, RT6 RW3. Medokan Ayu, Rungkut, Surabaya, 60297 (Sebelah alfamart)", phone: "0812332391663/081392197174" },
+            { name: "Samsul", address: "Stasiun Cilegon 0102, Jombang Wetan, Kota Cilegon, Jombang, Warung sate pak Hasan", phone: "081919705269" },
+            { name: "Sandy", address: "Kampung Api Api, Sungai Pinyuh, Kab.Mempawah, Kalimantan Barat", phone: "089609327622" },
+            { name: "Seiland Sticker", address: "Simpang empat dekat lampu merah, Simpang Rumbio, Kec. Lubuk Sikarah, Kab Solok, Prov. Sumatera Barat, 27316", phone: "082285339602" },
+            { name: "Shakila Variasi", address: "Dsn. Plosokandang, RT1 RW1, Ds. Plosokandang, Kec. Sanggau Ledo, Kab. Bengkayang, Kalimantan Barat", phone: "082159982893" },
+            { name: "Siok Guan", address: "Jl Dr Sutomo RT 11 No 11 Samping Salon Elisabeth, Tarakan, Kalimantan Utara", phone: "085333112622" },
+            { name: "Sirajuddin / Bp Zain", address: "Jl BNT Bukit Majannang Residence, B1 No 4, Desa ontoala, Kec. Palangga, Kab. Gowa, Sulawesi Selatan, 92161", phone: "082348002838" },
+            { name: "Sodiq", address: "Jl MT Haryono GG.24Ds, . Bugul lor, Kec. Panggungrejo, Pasuruan", phone: "083166456851" },
+            { name: "Sopiyan", address: "Perum Devely Residence Blok B5 No 2. Batu Besar, Nongsa, Batam", phone: "081275892966" },
+            { name: "Sticker Manokwari / Ismail", address: "Jompleks Makassar, RT3, RW8, Kel. Wasi Kampung, Kec. Manokwari Barat, Kab. Manokwari, Papua Barat", phone: "081248821813" },
+            { name: "Sugianur/Fany", address: "Jl Luwak Ranggan, RT 01 RW 01, Kec Cempaga, Kab. Kotawaringin Timur, Kalimantan Tengah", phone: "085751069603" },
+            { name: "Tanjung Variasi", address: "Depan Pos Polisi Mahasa KM 24, Desa Mahasa, Kec. Tambusai Utara, Kab. Rakan Hulu, Prov. Riau", phone: "081370809439" },
+            { name: "Tisya Jaya Variasi / Yanti", address: "Desa Beringin Jaya, Kec. Singingi Hilir, Kab. Kuantan Singingi, Riau, 29563", phone: "081277739657" },
+            { name: "Titan Sticker", address: "Jl Slamet Riyadi, Somodinatan, Kec. Kartasura, Kab. Sukoharjo, Jawa Tengah, 57169 dpn masjid Merdeka", phone: "081236429677" },
+            { name: "Toko Repost", address: "Gedang Merah Pasar Pagi Lama Asemka, Blok A no 14 Jl Petak Baru no 5, Jakarta Barat, DKI Jakarta", phone: "081224627824" },
+            { name: "Triana Kartika Ningrum", address: "Umbul Harjo RT 2 RW 12, Gumulan, Kec. Klaten Tengah, 57417", phone: "081370809439" },
+            { name: "Trident Custom Sticker", address: "Jl Raya Trisula, Kademangan (Timur Masjid), Kab. Blitar, Jawa Timur, 66161", phone: "085640038964" },
+            { name: "Ugy Variasi", address: "Jl Lintas Sumbawa, Manggelewa, Soriutu, Dompu, NTB", phone: "081236063817" },
+            { name: "Wahyu / Sarina Audio", address: "Jl Frans Sale Lega, Depan Denis Mart, Sblm Patung Caci, Labuan Bajo, NTT Flores. Nusa Tenggara Timur", phone: "081915687359" },
+            { name: "Warna Stiker", address: "Jl Pendidikan RT 03/02, Kec. Sanggau Ledo, Kab. Bengkayang, Kalimantan Barat", phone: "082159982893" },
+            { name: "Wawan/ Kios Wanted Sticker", address: "Jl Malaka 1 RT 10 RW 12, Kel. Rorotan, Kec. Cilincing, Jakarta Utara, 14140", phone: "081281767200" },
+            { name: "Xtreme Variasi / Frans", address: "Jl Mgr Eduardus Sansun, SVD Golokob, Sblm koperasi Sangosai, Labuan Bajo, NTT", phone: "081339393500" },
+            { name: "Zhoppenk Sticker", address: "Poros Adipura, STQ, Samping TK Futsal, Unaaha, Sulawesi Tenggara, 93411", phone: "082298155599" },
+            { name: "Idul Bengkel", address: "Depan SMPN 1 Maniis, Kampung Rawa Gempol, Jalan Raya F", phone: "085793506780" },
+            { name: "Sandy", address: "Kp. Api-Api Nomor rumah 13, Sungai Pinyuh, Kab. Mempawal", phone: "089609327622" },
+            { name: "Budi Setiawan", address: "Kp. Panyairan RT 2/ RW 16, Desa Cigugur Girang, Kec. Paron", phone: "081221801821" },
+            { name: "Redha Gusnadi", address: "Chong Khong Variasi, Kelurahan, Koto Tuo Limo Kampuang Ke", phone: "081213133778" },
+            { name: "Rid Saputra", address: "Sadakan Kidul RT 03 RW 04, Karangko Tawangmangu, Karang", phone: "085244850496" },
+            { name: "Abdurrahim", address: "(Rahman Stiker) Jalan Baringin RT I, RW I, Baringin A, Baringin", phone: "082150313178" },
+            { name: "Rahmat Ridha", address: "Jl RM.Marzuki KP. Teleng RT 02 RW 02, Karang Baru, Cikarang", phone: "081213273947" },
+            { name: "Kg Udien (Mr Doger 99)", address: "Jl. Pait RT 4/RW 2, Pait, Longikis, Kab. Paser, Kalimantan Tin", phone: "081234395578" },
+            { name: "Andri", address: "Jl. Pulau Bendu No 36, Desa hjilir Tengah, Ngabang, Kab. Lan", phone: "082155580224" },
+            { name: "Yaya Wahyudin", address: "Desa Tambang Emas. Kecamatan Pamenang Selatan, Kabup", phone: "082258158739" },
+            { name: "Edogawa", address: "Jalan Harun Nafsi. Kecamatan Loa Janan Ilir, Kelurahan Rapa", phone: "08115044034" },
+            { name: "Nasir", address: "Jalan Jemb Dua Raya No 28/RW 9, Angke, Tambora, 11330", phone: "083153264739" },
+            { name: "Stiker ACC", address: "Jl Wedoro Anom dari SDN Wedoro Anom Nganan dikit (toko", phone: "Phone" },
+            { name: "Nasikhudhin / Udin Stiker", address: "Toko TKG Sticker, Jalan Raya Bromo RT 1/RW 3, Karang Par", phone: "087761034277" },
+            { name: "Nisa (Rafi)", address: "Jalan Kapten Sujono No 93, RT II Kel. Paal Lima, Kec. Kota Ba", phone: "085765201844 (Rafi), 082" },
+            { name: "Saidatul Wafiyah / H Heru S", address: "Jalan Sunan Propen GG 4 No 02 RT 05/02 DESA KLANGONA", phone: "081333093166" }
+        ];
+
+        // --- DOM ELEMENT REFERENCES ---
+        const searchInput = document.getElementById('searchInput');
+        const resultsContainer = document.getElementById('results');
+        const addCustomerCard = document.getElementById('addCustomerCard');
+        const addCustomerForm = document.getElementById('addCustomerForm');
+        const addStatus = document.getElementById('addStatus');
+        const checkFeeBtn = document.getElementById('checkFeeBtn');
+        const toAddressInput = document.getElementById('toAddress');
+        const deliveryResultsContainer = document.getElementById('deliveryResults');
+
+        // --- SEARCH FUNCTIONALITY ---
+        searchInput.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            
+            // Clear previous results and hide the 'add customer' form
+            resultsContainer.innerHTML = '';
+            addCustomerCard.classList.add('hidden');
+            addStatus.innerHTML = '';
+
+            if (searchTerm.length < 2) {
+                return; // Don't search if the term is too short
+            }
+
+            const filteredCustomers = customerDatabase.filter(customer =>
+                customer.name.toLowerCase().includes(searchTerm) ||
+                customer.address.toLowerCase().includes(searchTerm)
+            );
+
+            if (filteredCustomers.length > 0) {
+                displayResults(filteredCustomers);
+            } else {
+                // If no results, show the form to add a new customer
+                resultsContainer.innerHTML = `<p class="text-center text-gray-500 p-4 bg-gray-50 rounded-lg">No customers found matching your search.</p>`;
+                addCustomerCard.classList.remove('hidden');
+            }
+        });
+
+        function displayResults(customers) {
+            customers.forEach(customer => {
+                const customerCard = document.createElement('div');
+                customerCard.className = 'p-4 border border-gray-200 rounded-lg bg-gray-50 hover:bg-blue-50 transition-colors';
+                customerCard.innerHTML = `
+                    <h3 class="font-semibold text-lg text-gray-800">${customer.name}</h3>
+                    <p class="text-gray-600"><i class="fas fa-map-marker-alt fa-fw mr-2 text-gray-400"></i>${customer.address}</p>
+                    <p class="text-gray-600"><i class="fas fa-phone fa-fw mr-2 text-gray-400"></i>${customer.phone}</p>
+                `;
+                resultsContainer.appendChild(customerCard);
+            });
+        }
+
+        // --- ADD NEW CUSTOMER FUNCTIONALITY ---
+        addCustomerForm.addEventListener('submit', (e) => {
+            e.preventDefault(); // Prevent the form from reloading the page
+            
+            const newName = document.getElementById('newName').value;
+            const newAddress = document.getElementById('newAddress').value;
+            const newPhone = document.getElementById('newPhone').value;
+
+            // Basic validation
+            if (!newName || !newAddress || !newPhone) {
+                addStatus.innerHTML = `<p class="text-red-500 font-semibold">Please fill in all fields.</p>`;
+                return;
+            }
+
+            // Add the new customer to our mock database
+            customerDatabase.push({ name: newName, address: newAddress, phone: newPhone });
+
+            // Provide feedback to the user
+            addStatus.innerHTML = `<p class="text-green-600 font-semibold">✓ Customer "${newName}" added successfully!</p>`;
+            
+            // Clear the form and hide the card after a short delay
+            addCustomerForm.reset();
+            setTimeout(() => {
+                addCustomerCard.classList.add('hidden');
+                addStatus.innerHTML = '';
+                 // Clear search to reflect the new state
+                searchInput.value = '';
+                resultsContainer.innerHTML = '';
+            }, 2500);
+        });
+
+        // --- DELIVERY FEE CALCULATOR FUNCTIONALITY ---
+        checkFeeBtn.addEventListener('click', () => {
+            const destination = toAddressInput.value;
+            if (!destination) {
+                deliveryResultsContainer.innerHTML = `<p class="text-center text-red-500 font-semibold">Please enter a destination address.</p>`;
+                return;
+            }
+
+            deliveryResultsContainer.innerHTML = `<p class="text-center text-gray-500">Calculating fees...</p>`;
+
+            // Simulate an API call with a delay
+            setTimeout(() => {
+                const couriers = ['Lion Parcel', 'SAP Express', 'Pos Indonesia'];
+                let resultsHTML = '<h3 class="font-semibold text-lg">Delivery Options:</h3>';
+                
+                couriers.forEach(courier => {
+                    // Generate a random fee for demonstration purposes
+                    const fee = (Math.random() * (40000 - 15000) + 15000).toFixed(0);
+                    const formattedFee = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(fee);
+                    
+                    resultsHTML += `
+                        <div class="flex justify-between items-center p-3 bg-gray-50 border rounded-lg">
+                            <span class="font-medium text-gray-700">${courier}</span>
+                            <span class="font-bold text-blue-600">${formattedFee}</span>
+                        </div>
+                    `;
+                });
+                
+                deliveryResultsContainer.innerHTML = resultsHTML;
+            }, 1000); // 1 second delay
+        });
+
+    </script>
+</body>
+</html>
